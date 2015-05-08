@@ -31,23 +31,10 @@ void PlayState::init()
 
     map = new tmx::MapLoader("data/maps");       // all maps/tiles will be read from data/maps
     // map->AddSearchPath("data/maps/tilesets"); // e.g.: adding more search paths for tilesets
-    map->Load("dungeon-tilesets2.tmx");
+    map->Load("teste.tmx");
 
-    walkStates[0] = "walk-right";
-    walkStates[1] = "walk-left";
-    walkStates[2] = "walk-up";
-    walkStates[3] = "walk-down";
-    currentDir = RIGHT;
-    player.load("data/img/warrior.png",64,64,0,0,0,0,13,21,273);
-    player.setPosition(40,100);
-    player.loadAnimation("data/img/warrioranim.xml");
-    player.setAnimation(walkStates[currentDir]);
-    player.setAnimRate(15);
-    player.setScale(0.5,0.5);
-    player.play();
-
-    dirx = 0; // sprite dir: right (1), left (-1)
-    diry = 0; // down (1), up (-1)
+    player.load("data/img/Char17.png");
+    player.setPosition(160,3150);
 
     im = cgf::InputManager::instance();
 
@@ -150,7 +137,12 @@ void PlayState::handleEvents(cgf::Game* game)
 void PlayState::update(cgf::Game* game)
 {
     screen = game->getScreen();
-    checkCollision(2, game, &player);
+
+
+    // CHECAR A COLISAO COM RESPECTIVO LAYER [0,1,2,...]
+    checkCollision(0, game, &player);
+
+
 //    player.update(game->getUpdateInterval());
     centerMapOnPlayer();
 }
@@ -161,7 +153,7 @@ void PlayState::draw(cgf::Game* game)
     map->Draw(*screen);          // draw all layers
 //    map->Draw(*screen, 1);     // draw only the second layer
     screen->draw(player);
-    screen->draw(text);
+    //screen->draw(text);
 }
 
 void PlayState::centerMapOnPlayer()
