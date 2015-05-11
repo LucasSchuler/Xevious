@@ -18,6 +18,10 @@
 
 class PlayState : public cgf::GameState
 {
+    private:
+    float panY;
+    float panX;
+
     public:
 
     void init();

@@ -19,6 +19,9 @@ using namespace std;
 
 void PlayState::init()
 {
+    panY = 2880;
+    panX = 160;
+
     if (!font.loadFromFile("data/fonts/arial.ttf")) {
         cout << "Cannot load arial.ttf font!" << endl;
         exit(1);
@@ -33,7 +36,7 @@ void PlayState::init()
     // map->AddSearchPath("data/maps/tilesets"); // e.g.: adding more search paths for tilesets
     map->Load("teste.tmx");
 
-    player.load("data/img/Char17.png");
+    player.load("data/img/nave.png");
     player.setPosition(160,3150);
 
     im = cgf::InputManager::instance();
@@ -85,8 +88,11 @@ void PlayState::handleEvents(cgf::Game* game)
     int newDir = currentDir;
 
     if(im->testEvent("left")) {
-        dirx = -1;
-        newDir = LEFT;
+        sf::Vector2f pos = player.getPosition();
+        if(pos.x>0){
+            dirx = -1;
+            newDir = LEFT;
+        }
     }
 
     if(im->testEvent("right")) {
@@ -100,8 +106,11 @@ void PlayState::handleEvents(cgf::Game* game)
     }
 
     if(im->testEvent("down")) {
-        diry = 1;
-        newDir = DOWN;
+        sf::Vector2f pos = player.getPosition();
+        if((pos.y - panY)<270){
+            diry = 1;
+            newDir = DOWN;
+        }
     }
 
     if(im->testEvent("quit") || im->testEvent("rightclick"))
@@ -143,7 +152,7 @@ void PlayState::update(cgf::Game* game)
     checkCollision(0, game, &player);
 
 
-//    player.update(game->getUpdateInterval());
+//    player.update(game->getUpdateInterval();
     centerMapOnPlayer();
 }
 
@@ -164,20 +173,12 @@ void PlayState::centerMapOnPlayer()
     viewsize.x /= 2;
     viewsize.y /= 2;
     sf::Vector2f pos = player.getPosition();
-
-    float panX = viewsize.x; // minimum pan
-    if(pos.x >= viewsize.x)
-        panX = pos.x;
-
-    if(panX >= mapsize.x - viewsize.x)
-        panX = mapsize.x - viewsize.x;
-
-    float panY = viewsize.y; // minimum pan
-    if(pos.y >= viewsize.y)
-        panY = pos.y;
-
-    if(panY >= mapsize.y - viewsize.y)
-        panY = mapsize.y - viewsize.y;
+    if(panY>330){
+        panY-=1;
+        if((pos.y - panY)>270){
+            player.setPosition(pos.x,pos.y-1);
+        }
+    }
 
     sf::Vector2f center(panX,panY);
     view.setCenter(center);
