@@ -6,7 +6,7 @@
  *  Copyright 2013 PUCRS. All rights reserved.
  *
  */
-
+#include <windows.h>
 #include <iostream>
 #include <cmath>
 #include "Game.h"
@@ -101,6 +101,11 @@ void PlayState::handleEvents(cgf::Game* game)
     }
 
     if(im->testEvent("up")) {
+        sf::Vector2f pos = player.getPosition();
+        if(pos.y<=100){
+            MessageBoxA(NULL,"Você Ganhou!", "Fim de Jogo" , MB_OK);
+            exit(0);
+        }
         diry = -1;
         newDir = UP;
     }
@@ -173,10 +178,11 @@ void PlayState::centerMapOnPlayer()
     viewsize.x /= 2;
     viewsize.y /= 2;
     sf::Vector2f pos = player.getPosition();
+
     if(panY>330){
         panY-=1;
         if((pos.y - panY)>270){
-            player.setPosition(pos.x,pos.y-1);
+             player.setPosition(pos.x,pos.y-1);
         }
     }
 
@@ -369,5 +375,6 @@ sf::Uint16 PlayState::getCellFromMap(uint8_t layernum, float x, float y)
     mapsize.y /= tilesize.y;
     int col = floor(x / tilesize.x);
     int row = floor(y / tilesize.y);
+
     return layer.tiles[row*mapsize.x + col].gid;
 }

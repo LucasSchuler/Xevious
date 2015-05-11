@@ -1028,7 +1028,8 @@
 	<math.h>
 	<SFML/Graphics/Rect.hpp>
 
-1431306682 source:c:\users\lucas\documents\xevious\examples\04_collisions\playstate.cpp
+1431311277 source:c:\users\lucas\documents\xevious\examples\04_collisions\playstate.cpp
+	<windows.h>
 	<iostream>
 	<cmath>
 	"Game.h"
