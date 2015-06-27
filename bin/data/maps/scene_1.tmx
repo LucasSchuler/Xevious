@@ -9,6 +9,6 @@
   </data>
  </layer>
  <imagelayer name="xevious">
-  <image source="Xevious(Arcade)-Area01_big.png"/>
+  <image source="scene_1.png"/>
  </imagelayer>
 </map>

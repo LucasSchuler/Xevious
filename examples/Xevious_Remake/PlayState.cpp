@@ -27,7 +27,7 @@ void PlayState::init()
         exit(1);
     }
     text.setFont(font);
-    text.setString(L"Testing text output in SFML");
+    text.setString(L"XEVIOUS REMAKE");
     text.setCharacterSize(24); // in pixels
     text.setColor(sf::Color::Yellow);
     text.setStyle(sf::Text::Bold | sf::Text::Underlined);
@@ -50,8 +50,8 @@ void PlayState::init()
     im->addMouseInput("rightclick", sf::Mouse::Right);
 
     // Camera control
-    im->addKeyInput("zoomin", sf::Keyboard::Z);
-    im->addKeyInput("zoomout", sf::Keyboard::X);
+    //im->addKeyInput("zoomin", sf::Keyboard::Z);
+    //im->addKeyInput("zoomout", sf::Keyboard::X);
 
     cout << "PlayState: Init" << endl;
 }
@@ -96,8 +96,11 @@ void PlayState::handleEvents(cgf::Game* game)
     }
 
     if(im->testEvent("right")) {
-        dirx = 1;
-        newDir = RIGHT;
+        sf::Vector2f pos = player.getPosition();
+        if(pos.x<320){
+            dirx = 1;
+            newDir = RIGHT;
+        }
     }
 
     if(im->testEvent("up")) {
