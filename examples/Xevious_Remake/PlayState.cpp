@@ -15,10 +15,51 @@
 
 PlayState PlayState::m_PlayState;
 
+cgf::Sprite terrestres1[9];
+cgf::Sprite terrestres2[8];
+cgf::Sprite chefe;
+
+cgf::Sprite tirosInimigos[1000];
+cgf::Sprite tirosNave[1000];
+
 using namespace std;
 
-void PlayState::init()
-{
+void PlayState::init(){
+
+    //Inicializar os inimigos terrestres e fixos
+    int i;
+    //for(i = 0 , i < 9 , i++){
+    //    terrestres1[0].load("data/img/enemy.png");
+    //}
+    terrestres1[0].setPosition(203,1144);
+    terrestres1[1].setPosition(203,1180);
+    terrestres1[2].setPosition(203,1271);
+    terrestres1[3].setPosition(183,408);
+    terrestres1[4].setPosition(228,457);
+    terrestres1[5].setPosition(274,507);
+    terrestres1[6].setPosition(172,1500);
+    terrestres1[7].setPosition(240,2005);
+    terrestres1[8].setPosition(170,2655);
+
+    //for(i = 0 , i < 8 , i++){
+    //    terrestres2[0].load("data/img/enemy.png");
+    //}
+    terrestres2[0].setPosition(55,455);
+    terrestres2[1].setPosition(251,482);
+    terrestres2[2].setPosition(205,433);
+    terrestres2[3].setPosition(171,763);
+    terrestres2[4].setPosition(172,1526);
+    terrestres2[5].setPosition(218,1980);
+    terrestres2[6].setPosition(207,2104);
+    terrestres2[7].setPosition(170,2261);
+
+    //chefe.load("data/img/enemy.png");
+    chefe.setPosition(183,304);
+
+
+    //Inicializar os inimigos moveis
+
+
     panY = 2880;
     panX = 160;
 
@@ -56,24 +97,26 @@ void PlayState::init()
     cout << "PlayState: Init" << endl;
 }
 
-void PlayState::cleanup()
-{
+void PlayState::inimigos(){
+    //para cada tipo de inimigo:
+    // há inimigos na janela atual
+    // disparar a cada 1 ou 2 segundos
+}
+
+void PlayState::cleanup(){
     delete map;
     cout << "PlayState: Clean" << endl;
 }
 
-void PlayState::pause()
-{
+void PlayState::pause(){
     cout << "PlayState: Paused" << endl;
 }
 
-void PlayState::resume()
-{
+void PlayState::resume(){
     cout << "PlayState: Resumed" << endl;
 }
 
-void PlayState::handleEvents(cgf::Game* game)
-{
+void PlayState::handleEvents(cgf::Game* game){
     screen = game->getScreen();
     sf::View view = screen->getView(); // gets the view
     sf::Event event;
@@ -106,7 +149,8 @@ void PlayState::handleEvents(cgf::Game* game)
     if(im->testEvent("up")) {
         sf::Vector2f pos = player.getPosition();
         if(pos.y<=100){
-            MessageBoxA(NULL,"Você Ganhou!", "Fim de Jogo" , MB_OK);
+            // professor reclamou que esse método abaixo é do windows somente e o jogo tem que ser multiplataforma.
+            //MessageBoxA(NULL,"Você Ganhou!", "Fim de Jogo" , MB_OK);
             exit(0);
         }
         diry = -1;
@@ -151,21 +195,17 @@ void PlayState::handleEvents(cgf::Game* game)
     player.setYspeed(100*diry);
 }
 
-void PlayState::update(cgf::Game* game)
-{
+void PlayState::update(cgf::Game* game){
     screen = game->getScreen();
-
 
     // CHECAR A COLISAO COM RESPECTIVO LAYER [0,1,2,...]
     checkCollision(0, game, &player);
 
-
-//    player.update(game->getUpdateInterval();
+    // player.update(game->getUpdateInterval();
     centerMapOnPlayer();
 }
 
-void PlayState::draw(cgf::Game* game)
-{
+void PlayState::draw(cgf::Game* game){
     screen = game->getScreen();
     map->Draw(*screen);          // draw all layers
 //    map->Draw(*screen, 1);     // draw only the second layer
@@ -173,8 +213,7 @@ void PlayState::draw(cgf::Game* game)
     //screen->draw(text);
 }
 
-void PlayState::centerMapOnPlayer()
-{
+void PlayState::centerMapOnPlayer(){
     sf::View view = screen->getView();
     sf::Vector2u mapsize = map->GetMapSize();
     sf::Vector2f viewsize = view.getSize();
@@ -194,8 +233,7 @@ void PlayState::centerMapOnPlayer()
     screen->setView(view);
 }
 
-bool PlayState::checkCollision(uint8_t layer, cgf::Game* game, cgf::Sprite* obj)
-{
+bool PlayState::checkCollision(uint8_t layer, cgf::Game* game, cgf::Sprite* obj){
     int i, x1, x2, y1, y2;
     bool bump = false;
 
@@ -368,8 +406,7 @@ bool PlayState::checkCollision(uint8_t layer, cgf::Game* game, cgf::Sprite* obj)
 }
 
 // Get a cell GID from the map (x and y in global coords)
-sf::Uint16 PlayState::getCellFromMap(uint8_t layernum, float x, float y)
-{
+sf::Uint16 PlayState::getCellFromMap(uint8_t layernum, float x, float y){
     auto layers = map->GetLayers();
     tmx::MapLayer& layer = layers[layernum];
     sf::Vector2u mapsize = map->GetMapSize();

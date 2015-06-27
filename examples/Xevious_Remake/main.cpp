@@ -20,6 +20,12 @@ int main(int argc, char **argv)
 
     game.changeState(PlayState::instance());
 
+    sf::Music music;
+    if (!music.openFromFile("data/audio/Game_Music.wav"))
+        return -1; // error
+    music.setLoop(true);
+    music.play();
+
 	while(game.isRunning())
 	{
 		game.handleEvents();

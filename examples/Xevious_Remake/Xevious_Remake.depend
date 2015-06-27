@@ -1037,7 +1037,7 @@
 	"PlayState.h"
 	"InputManager.h"
 
-1431380250 source:c:\users\antonio_carneiro\documents\xevious\examples\xevious_remake\main.cpp
+1435434274 source:c:\users\antonio_carneiro\documents\xevious\examples\xevious_remake\main.cpp
 	<iostream>
 	<cstdlib>
 	<string>
@@ -1045,14 +1045,14 @@
 	"Game.h"
 	"PlayState.h"
 
-1431375683 c:\users\antonio_carneiro\documents\xevious\examples\xevious_remake\playstate.h
+1435437218 c:\users\antonio_carneiro\documents\xevious\examples\xevious_remake\playstate.h
 	"GameState.h"
 	"Sprite.h"
 	"InputManager.h"
 	<tmx/MapLoader.h>
 	<string>
 
-1431380560 source:c:\users\antonio_carneiro\documents\xevious\examples\xevious_remake\playstate.cpp
+1435438259 source:c:\users\antonio_carneiro\documents\xevious\examples\xevious_remake\playstate.cpp
 	<windows.h>
 	<iostream>
 	<cmath>

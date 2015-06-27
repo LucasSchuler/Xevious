@@ -65,6 +65,8 @@ class PlayState : public cgf::GameState
     sf::Font font;
     sf::Text text;
 
+    void inimigos();
+
     // Centers the camera on the player position
     void centerMapOnPlayer();
 
