@@ -67,6 +67,10 @@ class PlayState : public cgf::GameState
 
     void inimigos();
 
+    void movTiros();
+
+    void criaTiroNave();
+
     // Centers the camera on the player position
     void centerMapOnPlayer();
 

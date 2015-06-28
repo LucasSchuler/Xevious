@@ -15,12 +15,18 @@
 
 PlayState PlayState::m_PlayState;
 
+// mudar pra usar "sf::Vector2f" position vai ocupar menos memória.
 cgf::Sprite terrestres1[9];
 cgf::Sprite terrestres2[8];
 cgf::Sprite chefe;
 
-cgf::Sprite tirosInimigos[1000];
-cgf::Sprite tirosNave[1000];
+cgf::Sprite tirosIniReto[100];
+cgf::Sprite tirosIniDiag[100];
+cgf::Sprite tirosNave[100];
+
+sf::Clock clockCriaTirosNave; // starts the clock
+sf::Clock clockCriaTiros; // starts the clock
+
 
 using namespace std;
 
@@ -28,6 +34,18 @@ void PlayState::init(){
 
     //Inicializar os inimigos terrestres e fixos
     int i;
+    for(i = 0 ; i < 100 ; i++){
+
+        tirosIniReto[i].setPosition(-1,-1);
+        //tirosIniReto[i].load("data/img/tiro1.png");
+
+        tirosIniDiag[i].setPosition(-1,-1);
+        //tirosIniDiag[i].load("data/img/tiro1.png");
+
+        tirosNave[i].setPosition(-1,-1);
+        //tirosNave[i].load("data/img/tiro1.png");
+
+    }
     //for(i = 0 , i < 9 , i++){
     //    terrestres1[0].load("data/img/enemy.png");
     //}
@@ -89,6 +107,7 @@ void PlayState::init(){
     im->addKeyInput("quit", sf::Keyboard::Escape);
     im->addKeyInput("stats", sf::Keyboard::S);
     im->addMouseInput("rightclick", sf::Mouse::Right);
+    im->addKeyInput("space", sf::Keyboard::Space);
 
     // Camera control
     //im->addKeyInput("zoomin", sf::Keyboard::Z);
@@ -97,10 +116,128 @@ void PlayState::init(){
     cout << "PlayState: Init" << endl;
 }
 
+void criaTiroDiagInimigo(float x, float y){
+    int i;
+    for(i = 0 ; i < 100 ; i++){
+        if(tirosIniDiag[i].getPosition().y == -1){
+            tirosIniDiag[i].load("data/img/tiro.png");
+            tirosIniDiag[i].setScale(0.4,0.4);
+            tirosIniDiag[i].setPosition(x-3,y-3);
+            tirosIniDiag[i+1].load("data/img/tiro.png");
+            tirosIniDiag[i+1].setScale(0.4,0.4);
+            tirosIniDiag[i+1].setPosition(x-3,y-3);
+            return;
+        }
+    }
+}
+
+void criaTiroRetoInimigo(float x, float y){
+    int i;
+    for(i = 0 ; i < 100 ; i++){
+        if(tirosIniReto[i].getPosition().y == -1){
+            tirosIniReto[i].load("data/img/tiro.png");
+            tirosIniReto[i].setScale(0.4,0.4);
+            tirosIniReto[i].setPosition(x-3,y-3);
+            return;
+        }
+    }
+}
+
 void PlayState::inimigos(){
+    // criando tiros a cada 2 segundos e zerando o clock.
+    sf::Time elapsed = clockCriaTiros.getElapsedTime();
+    if(elapsed.asSeconds() < 2) return;
+    else clockCriaTiros.restart();
     //para cada tipo de inimigo:
-    // há inimigos na janela atual
+    int i;
+    sf::Vector2f pos;
+    for(i = 0; i < 9; i++){
+        pos = terrestres1[i].getPosition();
+        // há inimigos na janela atual
+        if(pos.y < panY+300 && pos.y > panY-400){
+            //disparar
+            criaTiroDiagInimigo(pos.x, pos.y);
+        }
+    }
+    for(i = 0; i < 9; i++){
+        pos = terrestres2[i].getPosition();
+        // há inimigos na janela atual
+        if(pos.y < panY+300 && pos.y > panY-400){
+            //disparar
+            criaTiroRetoInimigo(pos.x, pos.y);
+        }
+    }
     // disparar a cada 1 ou 2 segundos
+}
+
+void PlayState::movTiros(){
+    int i, dirX = 0, dirY = 0;
+    sf::Vector2f pos;
+    // movendo tiros diagonais do inimigo
+    for(i = 0 ; i < 100 ; i++){
+        pos = tirosIniDiag[i].getPosition();
+        if(pos.y != -1){
+            if(i%2 == 0){ //par -> direita
+                //dirX = 1;
+                //dirY = 3;
+                tirosIniDiag[i].setPosition(pos.x+1,pos.y+3);
+            }
+            else{ //impar -> esquerda
+                //dirX = -1;
+                //dirY = 3;
+                tirosIniDiag[i].setPosition(pos.x-1,pos.y+3);
+            }
+            //tirosIniDiag[i].setXspeed(100*dirX);
+            //tirosIniDiag[i].setYspeed(100*dirY);
+
+            if(pos.x > 320 || pos.x < (-32)){ // remover o tiro que saiu da tela.
+                tirosIniDiag[i].setPosition(-1,-1);
+            }
+        }
+
+    }
+    // movendo tiros retos do inimigo
+    for(i = 0 ; i < 100 ; i++){
+        pos = tirosIniReto[i].getPosition();
+        if(pos.y != -1){
+            tirosIniReto[i].setPosition(pos.x,pos.y+3);
+
+            if(pos.x > 320 || pos.x < (-32)){ // remover o tiro que saiu da tela.
+                tirosIniReto[i].setPosition(-1,-1);
+            }
+        }
+
+    }
+    // movendo tiros da nave
+    for(i = 0 ; i < 100 ; i++){
+        pos = tirosNave[i].getPosition();
+        if(pos.y != -1){
+            tirosNave[i].setPosition(pos.x,pos.y-7);
+
+            if(pos.x > 320 || pos.x < (-32)){ // remover o tiro que saiu da tela.
+                tirosNave[i].setPosition(-1,-1);
+            }
+        }
+
+    }
+}
+
+void PlayState::criaTiroNave(){
+    // criando tiros a cada 2 segundos e zerando o clock.
+    sf::Time elapsed = clockCriaTirosNave.getElapsedTime();
+    if(elapsed.asSeconds() < 0.1) return;
+    else clockCriaTirosNave.restart();
+
+    sf::Vector2f pos = player.getPosition();
+    int i;
+    for(i = 0 ; i < 100 ; i++){
+        if(tirosNave[i].getPosition().y == -1){
+            tirosNave[i].load("data/img/tiro.png");
+            tirosNave[i].setScale(0.4,0.4);
+            tirosNave[i].setPosition(pos.x-3,pos.y-3);
+            return;
+        }
+    }
 }
 
 void PlayState::cleanup(){
@@ -130,37 +267,42 @@ void PlayState::handleEvents(cgf::Game* game){
     dirx = diry = 0;
     int newDir = currentDir;
 
+    if(im->testEvent("space"))
+        criaTiroNave();
+
     if(im->testEvent("left")) {
         sf::Vector2f pos = player.getPosition();
         if(pos.x>0){
-            dirx = -1;
+            dirx = -2;
             newDir = LEFT;
         }
     }
 
     if(im->testEvent("right")) {
         sf::Vector2f pos = player.getPosition();
-        if(pos.x<320){
-            dirx = 1;
+        if(pos.x<350){
+            dirx = 2;
             newDir = RIGHT;
         }
     }
 
     if(im->testEvent("up")) {
         sf::Vector2f pos = player.getPosition();
-        if(pos.y<=100){
+        if(pos.y <= 100){
             // professor reclamou que esse método abaixo é do windows somente e o jogo tem que ser multiplataforma.
             //MessageBoxA(NULL,"Você Ganhou!", "Fim de Jogo" , MB_OK);
             exit(0);
         }
-        diry = -1;
-        newDir = UP;
+        if(pos.y >= (panY-315)) {
+            diry = -2;
+            newDir = UP;
+        }
     }
 
     if(im->testEvent("down")) {
         sf::Vector2f pos = player.getPosition();
-        if((pos.y - panY)<270){
-            diry = 1;
+        if((pos.y - panY)<290){
+            diry = 2;
             newDir = DOWN;
         }
     }
@@ -170,6 +312,9 @@ void PlayState::handleEvents(cgf::Game* game){
 
     if(im->testEvent("stats"))
         game->toggleStats();
+
+
+
 
     if(im->testEvent("zoomin")) {
         view.zoom(1.01);
@@ -203,6 +348,12 @@ void PlayState::update(cgf::Game* game){
 
     // player.update(game->getUpdateInterval();
     centerMapOnPlayer();
+
+    // cria tiros inimigos se ele aparecer na tela.
+    inimigos();
+
+    // move os tiros na tela
+    movTiros();
 }
 
 void PlayState::draw(cgf::Game* game){
@@ -210,6 +361,12 @@ void PlayState::draw(cgf::Game* game){
     map->Draw(*screen);          // draw all layers
 //    map->Draw(*screen, 1);     // draw only the second layer
     screen->draw(player);
+    int i;
+    for(i = 0 ; i < 100 ; i++){
+        if(tirosIniReto[i].getPosition().y > 0) screen->draw(tirosIniReto[i]);
+        if(tirosIniDiag[i].getPosition().y > 0) screen->draw(tirosIniDiag[i]);
+        if(tirosNave[i].getPosition().y > 0) screen->draw(tirosNave[i]);
+    }
     //screen->draw(text);
 }
 
@@ -223,7 +380,7 @@ void PlayState::centerMapOnPlayer(){
 
     if(panY>330){
         panY-=1;
-        if((pos.y - panY)>270){
+        if((pos.y - panY)>290){
              player.setPosition(pos.x,pos.y-1);
         }
     }
