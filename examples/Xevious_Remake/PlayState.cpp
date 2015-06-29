@@ -27,6 +27,7 @@ cgf::Sprite tirosNave[100];
 sf::Clock clockCriaTirosNave; // starts the clock
 sf::Clock clockCriaTiros; // starts the clock
 
+int vidaNave = 7;
 
 using namespace std;
 
@@ -199,6 +200,8 @@ void PlayState::movTiros(){
     // movendo tiros retos do inimigo
     for(i = 0 ; i < 100 ; i++){
         pos = tirosIniReto[i].getPosition();
+        //cout<<"tiro:";
+        //cout<<pos.y;
         if(pos.y != -1){
             tirosIniReto[i].setPosition(pos.x,pos.y+3);
 
@@ -354,6 +357,9 @@ void PlayState::update(cgf::Game* game){
 
     // move os tiros na tela
     movTiros();
+
+    //Verifica se algum tiro acertou o seu alvo
+    colisaoTiros();
 }
 
 void PlayState::draw(cgf::Game* game){
@@ -388,6 +394,58 @@ void PlayState::centerMapOnPlayer(){
     sf::Vector2f center(panX,panY);
     view.setCenter(center);
     screen->setView(view);
+}
+
+void PlayState::colisaoTiros(){
+    sf::Vector2f pos = player.getPosition();
+
+    //Colisoes contra a nave
+    for(int i=0; i<100; i++){
+        sf::Vector2f posTiroReto = tirosIniReto[i].getPosition();
+        sf::Vector2f posTiroDiag = tirosIniDiag[i].getPosition();
+        //Verifica se algum tiro reto acertou
+        if(posTiroReto.x>=pos.x-10 && posTiroReto.x<=pos.x+30 && posTiroReto.y>=pos.y-30 && posTiroReto.y<=pos.y+30){
+            vidaNave--;
+            tirosIniReto[i].setPosition(-1,-1);
+            //cout<<"acertou Reto";
+        }
+        //Verifica se algum tiro diag acertou
+        if(posTiroDiag.x>=pos.x-10 && posTiroDiag.x<=pos.x+30 && posTiroDiag.y>=pos.y-40 && posTiroDiag.y<=pos.y+30){
+            vidaNave--;
+            tirosIniDiag[i].setPosition(-1,-1);
+            //cout<<"acertou Diag";
+        }
+    }
+
+    //Verifica se as vidas acabaram
+    if(vidaNave==0)
+        cout<<"perdeu";
+
+    //Colisoes contra os inimigos
+    for(int i=0; i<100; i++){
+        sf::Vector2f posTiroNave = tirosNave[i].getPosition();
+        //Verificar p/ todos inimigos terrestres1
+        for(int ter1=0;ter1<9;ter1++){
+            sf::Vector2f posTerrestre = terrestres1[ter1].getPosition();
+            if(posTiroNave.x<=posTerrestre.x+20 && posTiroNave.x>=posTerrestre.x-20 && posTiroNave.y>=posTerrestre.y-40 && posTiroNave.y<=posTerrestre.y+30){
+              tirosNave[i].setPosition(-1,-1);
+               // cout<<"acertou Inimigo";
+            }
+        }
+        //Verificar p/ todos inimigos terrestres2
+        for(int ter2=0;ter2<8;ter2++){
+            sf::Vector2f posTerrestre = terrestres2[ter2].getPosition();
+            if(posTiroNave.x<=posTerrestre.x+20 && posTiroNave.x>=posTerrestre.x-20 && posTiroNave.y>=posTerrestre.y-40 && posTiroNave.y<=posTerrestre.y+30){
+               tirosNave[i].setPosition(-1,-1);
+               // cout<<"acertou Inimigo";
+            }
+        }
+        //Verificar se acertou o chefe
+        if(posTiroNave.x<=chefe.getPosition().x+30 && posTiroNave.x>=chefe.getPosition().x-30 && posTiroNave.y>=chefe.getPosition().y-40 && posTiroNave.y<=chefe.getPosition().y+30){
+            tirosNave[i].setPosition(-1,-1);
+           // cout<<"chefe";
+        }
+    }
 }
 
 bool PlayState::checkCollision(uint8_t layer, cgf::Game* game, cgf::Sprite* obj){
