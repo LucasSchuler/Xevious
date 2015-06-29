@@ -15,19 +15,8 @@
 
 PlayState PlayState::m_PlayState;
 
-// mudar pra usar "sf::Vector2f" position vai ocupar menos memória.
-cgf::Sprite terrestres1[9];
-cgf::Sprite terrestres2[8];
-cgf::Sprite chefe;
-
-cgf::Sprite tirosIniReto[100];
-cgf::Sprite tirosIniDiag[100];
-cgf::Sprite tirosNave[100];
-
-sf::Clock clockCriaTirosNave; // starts the clock
-sf::Clock clockCriaTiros; // starts the clock
-
 int vidaNave = 7;
+int inimigos = 0;
 
 using namespace std;
 
@@ -36,20 +25,11 @@ void PlayState::init(){
     //Inicializar os inimigos terrestres e fixos
     int i;
     for(i = 0 ; i < 100 ; i++){
-
         tirosIniReto[i].setPosition(-1,-1);
-        //tirosIniReto[i].load("data/img/tiro1.png");
-
         tirosIniDiag[i].setPosition(-1,-1);
-        //tirosIniDiag[i].load("data/img/tiro1.png");
-
         tirosNave[i].setPosition(-1,-1);
-        //tirosNave[i].load("data/img/tiro1.png");
-
     }
-    //for(i = 0 , i < 9 , i++){
-    //    terrestres1[0].load("data/img/enemy.png");
-    //}
+
     terrestres1[0].setPosition(203,1144);
     terrestres1[1].setPosition(203,1180);
     terrestres1[2].setPosition(203,1271);
@@ -60,9 +40,6 @@ void PlayState::init(){
     terrestres1[7].setPosition(240,2005);
     terrestres1[8].setPosition(170,2655);
 
-    //for(i = 0 , i < 8 , i++){
-    //    terrestres2[0].load("data/img/enemy.png");
-    //}
     terrestres2[0].setPosition(55,455);
     terrestres2[1].setPosition(251,482);
     terrestres2[2].setPosition(205,433);
@@ -75,8 +52,8 @@ void PlayState::init(){
     //chefe.load("data/img/enemy.png");
     chefe.setPosition(183,304);
 
-
     //Inicializar os inimigos moveis
+
 
 
     panY = 2880;
@@ -86,11 +63,20 @@ void PlayState::init(){
         cout << "Cannot load arial.ttf font!" << endl;
         exit(1);
     }
-    text.setFont(font);
-    text.setString(L"XEVIOUS REMAKE");
-    text.setCharacterSize(24); // in pixels
-    text.setColor(sf::Color::Yellow);
-    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+    placar.setFont(font);
+    placar.setString("Vidas: "+vidaNave);//" Vidas:"+vidaNave +" - Inimigos Mortos:"+inimigos);
+    placar.setCharacterSize(20); // in pixels
+    placar.setColor(sf::Color::Yellow);
+    placar.setStyle(sf::Text::Bold);
+    placar.setPosition(panX,panY);
+
+    acabou.setFont(font);
+    acabou.setCharacterSize(30); // in pixels
+    acabou.setColor(sf::Color::Blue);
+    acabou.setStyle(sf::Text::Bold);
+    //acabou.setString("        Parabéns!\n\n Você foi o vencedor\n\n\n      Vá para cima \n até o fim do cenário");
+    //acabou.setPosition(panX-150, panY-100);
 
     map = new tmx::MapLoader("data/maps");       // all maps/tiles will be read from data/maps
     // map->AddSearchPath("data/maps/tilesets"); // e.g.: adding more search paths for tilesets
@@ -110,14 +96,10 @@ void PlayState::init(){
     im->addMouseInput("rightclick", sf::Mouse::Right);
     im->addKeyInput("space", sf::Keyboard::Space);
 
-    // Camera control
-    //im->addKeyInput("zoomin", sf::Keyboard::Z);
-    //im->addKeyInput("zoomout", sf::Keyboard::X);
-
     cout << "PlayState: Init" << endl;
 }
 
-void criaTiroDiagInimigo(float x, float y){
+void PlayState::criaTiroDiagInimigo(float x, float y){
     int i;
     for(i = 0 ; i < 100 ; i++){
         if(tirosIniDiag[i].getPosition().y == -1){
@@ -132,7 +114,7 @@ void criaTiroDiagInimigo(float x, float y){
     }
 }
 
-void criaTiroRetoInimigo(float x, float y){
+void PlayState::criaTiroRetoInimigo(float x, float y){
     int i;
     for(i = 0 ; i < 100 ; i++){
         if(tirosIniReto[i].getPosition().y == -1){
@@ -155,7 +137,7 @@ void PlayState::inimigos(){
     for(i = 0; i < 9; i++){
         pos = terrestres1[i].getPosition();
         // há inimigos na janela atual
-        if(pos.y < panY+300 && pos.y > panY-400){
+        if(pos.y < panY+300 && pos.y > panY-400 && pos.y != 0 && pos.x != 0){
             //disparar
             criaTiroDiagInimigo(pos.x, pos.y);
         }
@@ -163,7 +145,7 @@ void PlayState::inimigos(){
     for(i = 0; i < 9; i++){
         pos = terrestres2[i].getPosition();
         // há inimigos na janela atual
-        if(pos.y < panY+300 && pos.y > panY-400){
+        if(pos.y < panY+300 && pos.y > panY-400 && pos.y != 0 && pos.x != 0){
             //disparar
             criaTiroRetoInimigo(pos.x, pos.y);
         }
@@ -191,7 +173,7 @@ void PlayState::movTiros(){
             //tirosIniDiag[i].setXspeed(100*dirX);
             //tirosIniDiag[i].setYspeed(100*dirY);
 
-            if(pos.x > 320 || pos.x < (-32)){ // remover o tiro que saiu da tela.
+            if(pos.x > 320 || pos.x < -32 || pos.y < panY-320 || pos.y > panY+320 ){ // remover o tiro que saiu da tela.
                 tirosIniDiag[i].setPosition(-1,-1);
             }
         }
@@ -205,7 +187,7 @@ void PlayState::movTiros(){
         if(pos.y != -1){
             tirosIniReto[i].setPosition(pos.x,pos.y+3);
 
-            if(pos.x > 320 || pos.x < (-32)){ // remover o tiro que saiu da tela.
+            if(pos.x > 320 || pos.x < -32 || pos.y < panY-320 || pos.y > panY+320 ){ // remover o tiro que saiu da tela.
                 tirosIniReto[i].setPosition(-1,-1);
             }
         }
@@ -217,7 +199,7 @@ void PlayState::movTiros(){
         if(pos.y != -1){
             tirosNave[i].setPosition(pos.x,pos.y-7);
 
-            if(pos.x > 320 || pos.x < (-32)){ // remover o tiro que saiu da tela.
+            if(pos.x > 320 || pos.x < -32 || pos.y < panY-320 || pos.y > panY+320 ){ // remover o tiro que saiu da tela.
                 tirosNave[i].setPosition(-1,-1);
             }
         }
@@ -237,7 +219,7 @@ void PlayState::criaTiroNave(){
         if(tirosNave[i].getPosition().y == -1){
             tirosNave[i].load("data/img/tiro.png");
             tirosNave[i].setScale(0.4,0.4);
-            tirosNave[i].setPosition(pos.x-3,pos.y-3);
+            tirosNave[i].setPosition(pos.x+12,pos.y-6);
             return;
         }
     }
@@ -270,8 +252,9 @@ void PlayState::handleEvents(cgf::Game* game){
     dirx = diry = 0;
     int newDir = currentDir;
 
-    if(im->testEvent("space"))
+    if(im->testEvent("space")){
         criaTiroNave();
+    }
 
     if(im->testEvent("left")) {
         sf::Vector2f pos = player.getPosition();
@@ -291,9 +274,7 @@ void PlayState::handleEvents(cgf::Game* game){
 
     if(im->testEvent("up")) {
         sf::Vector2f pos = player.getPosition();
-        if(pos.y <= 100){
-            // professor reclamou que esse método abaixo é do windows somente e o jogo tem que ser multiplataforma.
-            //MessageBoxA(NULL,"Você Ganhou!", "Fim de Jogo" , MB_OK);
+        if(pos.y <= 0){
             exit(0);
         }
         if(pos.y >= (panY-315)) {
@@ -373,7 +354,8 @@ void PlayState::draw(cgf::Game* game){
         if(tirosIniDiag[i].getPosition().y > 0) screen->draw(tirosIniDiag[i]);
         if(tirosNave[i].getPosition().y > 0) screen->draw(tirosNave[i]);
     }
-    //screen->draw(text);
+    screen->draw(placar);
+    screen->draw(acabou);
 }
 
 void PlayState::centerMapOnPlayer(){
@@ -404,13 +386,19 @@ void PlayState::colisaoTiros(){
         sf::Vector2f posTiroReto = tirosIniReto[i].getPosition();
         sf::Vector2f posTiroDiag = tirosIniDiag[i].getPosition();
         //Verifica se algum tiro reto acertou
-        if(posTiroReto.x>=pos.x-10 && posTiroReto.x<=pos.x+30 && posTiroReto.y>=pos.y-30 && posTiroReto.y<=pos.y+30){
+        if(posTiroReto.x>=pos.x-10
+           && posTiroReto.x<=pos.x+30
+           && posTiroReto.y>=pos.y-30
+           && posTiroReto.y<=pos.y+30){
             vidaNave--;
             tirosIniReto[i].setPosition(-1,-1);
             //cout<<"acertou Reto";
         }
-        //Verifica se algum tiro diag acertou
-        if(posTiroDiag.x>=pos.x-10 && posTiroDiag.x<=pos.x+30 && posTiroDiag.y>=pos.y-40 && posTiroDiag.y<=pos.y+30){
+        // Verifica se algum tiro diag acertou
+        if(posTiroDiag.x>=pos.x-10
+           && posTiroDiag.x<=pos.x+30
+           && posTiroDiag.y>=pos.y-40
+           && posTiroDiag.y<=pos.y+30){
             vidaNave--;
             tirosIniDiag[i].setPosition(-1,-1);
             //cout<<"acertou Diag";
@@ -418,8 +406,12 @@ void PlayState::colisaoTiros(){
     }
 
     //Verifica se as vidas acabaram
-    if(vidaNave==0)
+    if(vidaNave==0){
         cout<<"perdeu";
+        acabou.setColor(sf::Color::Red);
+        acabou.setString("    Você foi derrotado.\n\n\n   pressione ESC");
+        acabou.setPosition(panX-150, panY-100);
+    }
 
     //Colisoes contra os inimigos
     for(int i=0; i<100; i++){
@@ -427,23 +419,39 @@ void PlayState::colisaoTiros(){
         //Verificar p/ todos inimigos terrestres1
         for(int ter1=0;ter1<9;ter1++){
             sf::Vector2f posTerrestre = terrestres1[ter1].getPosition();
-            if(posTiroNave.x<=posTerrestre.x+20 && posTiroNave.x>=posTerrestre.x-20 && posTiroNave.y>=posTerrestre.y-40 && posTiroNave.y<=posTerrestre.y+30){
-              tirosNave[i].setPosition(-1,-1);
+            if(posTiroNave.x<=posTerrestre.x+20
+               && posTiroNave.x>=posTerrestre.x-20
+               && posTiroNave.y>=posTerrestre.y-40
+               && posTiroNave.y<=posTerrestre.y+30
+               ){
+              tirosNave[i].setPosition(-1,-1);      // eliminando o tiro
+              terrestres1[ter1].setPosition(-1,-1); // eliminando o inimigo
                // cout<<"acertou Inimigo";
             }
         }
         //Verificar p/ todos inimigos terrestres2
         for(int ter2=0;ter2<8;ter2++){
             sf::Vector2f posTerrestre = terrestres2[ter2].getPosition();
-            if(posTiroNave.x<=posTerrestre.x+20 && posTiroNave.x>=posTerrestre.x-20 && posTiroNave.y>=posTerrestre.y-40 && posTiroNave.y<=posTerrestre.y+30){
-               tirosNave[i].setPosition(-1,-1);
+            if(posTiroNave.x<=posTerrestre.x+20
+               && posTiroNave.x>=posTerrestre.x-20
+               && posTiroNave.y>=posTerrestre.y-40
+               && posTiroNave.y<=posTerrestre.y+30
+               ){
+                tirosNave[i].setPosition(-1,-1);        // eliminando o tiro
+                terrestres2[ter2].setPosition(-1,-1);   // eliminando o inimigo
                // cout<<"acertou Inimigo";
             }
         }
         //Verificar se acertou o chefe
-        if(posTiroNave.x<=chefe.getPosition().x+30 && posTiroNave.x>=chefe.getPosition().x-30 && posTiroNave.y>=chefe.getPosition().y-40 && posTiroNave.y<=chefe.getPosition().y+30){
-            tirosNave[i].setPosition(-1,-1);
-           // cout<<"chefe";
+        if(posTiroNave.x<=chefe.getPosition().x+30
+           && posTiroNave.x>=chefe.getPosition().x-30
+           && posTiroNave.y>=chefe.getPosition().y-40
+           && posTiroNave.y<=chefe.getPosition().y+30
+           ){
+            tirosNave[i].setPosition(-1,-1);// eliminando o tiro
+            chefe.setPosition(-1,-1);       // eliminando o inimigo
+            acabou.setString("        Parabéns!\n\n Você foi o vencedor\n\n\n      Vá para cima \n até o fim do cenário");
+            acabou.setPosition(panX-150, panY-100);
         }
     }
 }

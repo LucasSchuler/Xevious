@@ -56,6 +56,16 @@ class PlayState : public cgf::GameState
     int dirx, diry;
 
     cgf::Sprite player;
+    cgf::Sprite terrestres1[9];
+    cgf::Sprite terrestres2[8];
+    cgf::Sprite chefe;
+
+    cgf::Sprite tirosIniReto[100];
+    cgf::Sprite tirosIniDiag[100];
+    cgf::Sprite tirosNave[100];
+
+    sf::Clock clockCriaTirosNave; // starts the clock
+    sf::Clock clockCriaTiros; // starts the clock
 
     sf::RenderWindow* screen;
     cgf::InputManager* im;
@@ -64,6 +74,8 @@ class PlayState : public cgf::GameState
 
     sf::Font font;
     sf::Text text;
+    sf::Text placar;
+    sf::Text acabou;
 
     void inimigos();
 
@@ -72,6 +84,10 @@ class PlayState : public cgf::GameState
     void criaTiroNave();
 
     void colisaoTiros();
+
+    void criaTiroDiagInimigo(float x, float y);
+
+    void criaTiroRetoInimigo(float x, float y);
 
     // Centers the camera on the player position
     void centerMapOnPlayer();
