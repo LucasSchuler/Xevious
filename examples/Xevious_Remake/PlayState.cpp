@@ -129,7 +129,7 @@ void PlayState::criaTiroRetoInimigo(float x, float y){
 void PlayState::inimigos(){
     // criando tiros a cada 2 segundos e zerando o clock.
     sf::Time elapsed = clockCriaTiros.getElapsedTime();
-    if(elapsed.asSeconds() < 2) return;
+    if(elapsed.asSeconds() < 0.5) return;
     else clockCriaTiros.restart();
     //para cada tipo de inimigo:
     int i;
@@ -274,7 +274,7 @@ void PlayState::handleEvents(cgf::Game* game){
 
     if(im->testEvent("up")) {
         sf::Vector2f pos = player.getPosition();
-        if(pos.y <= 0){
+        if(pos.y <= 50){
             exit(0);
         }
         if(pos.y >= (panY-315)) {

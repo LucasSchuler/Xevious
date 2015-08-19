@@ -58,10 +58,13 @@ class PlayState : public cgf::GameState
     cgf::Sprite player;
     cgf::Sprite terrestres1[9];
     cgf::Sprite terrestres2[8];
+    cgf::Sprite terrestres1sp[9];
+    cgf::Sprite terrestres2sp[8];
     cgf::Sprite chefe;
 
     cgf::Sprite tirosIniReto[100];
     cgf::Sprite tirosIniDiag[100];
+
     cgf::Sprite tirosNave[100];
 
     sf::Clock clockCriaTirosNave; // starts the clock
